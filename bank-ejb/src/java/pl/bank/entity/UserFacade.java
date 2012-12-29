@@ -12,10 +12,10 @@ import javax.persistence.Query;
  * @author carbolymer
  */
 @Stateless
-public class KlientFacade extends AbstractFacade<Klient> {
+public class UserFacade extends AbstractFacade<User> {
     
-    public KlientFacade() {
-        super(Klient.class);
+    public UserFacade() {
+        super(User.class);
     }
     
     @PersistenceContext(name="bank-ejbPU")
@@ -25,24 +25,22 @@ public class KlientFacade extends AbstractFacade<Klient> {
     protected EntityManager getEntityManager() {
         return em;
     }
-
-
     
-    public void save(Klient klient){
-        if(klient.getId() == null){
-            em.persist(klient);
+    public void save(User client){
+        if(client.getId() == null){
+            em.persist(client);
         }else{
-            em.merge(klient); 
+            em.merge(client); 
         }                 
     }
     
-    public List<Klient> search(String searchTerm){
+    public List<User> findByUsername(String searchTerm){
         if(searchTerm != null){
-            Query q = em.createNamedQuery("searchBlogs"); 
+            Query q = em.createNamedQuery("findUsers"); 
             q.setParameter("term", searchTerm);
             return q.getResultList();
         }else{
-            return em.createNamedQuery("getBlogs").getResultList();
+            return em.createNamedQuery("getUsers").getResultList();
         }
         
     }

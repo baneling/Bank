@@ -5,20 +5,33 @@
 package pl.bank.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 
 /**
  *
  * @author carbolymer
  */
 @Entity
-public class Konto implements Serializable {
-    @OneToOne(mappedBy = "account")
-    private Klient client;
+@NamedQueries({
+    @NamedQuery(
+       name = "getAccounts", 
+       query="SELECT a FROM Account a"
+    ),
+    @NamedQuery(
+       name = "findByNumber", 
+       query="SELECT a FROM Account a WHERE a.number = :number"
+    )
+})
+public class Account implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -26,6 +39,10 @@ public class Konto implements Serializable {
     
     private Long number;
     private Long balance;
+    @ManyToOne
+    private User user;
+    @OneToMany(mappedBy = "account")
+    private List<Transaction> transactions = new ArrayList<Transaction>();
 
     public Long getId() {
         return id;
@@ -45,10 +62,10 @@ public class Konto implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Konto)) {
+        if (!(object instanceof Account)) {
             return false;
         }
-        Konto other = (Konto) object;
+        Account other = (Account) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -58,6 +75,20 @@ public class Konto implements Serializable {
     @Override
     public String toString() {
         return "pl.bank.entity.Konto[ id=" + id + " ]";
+    }
+
+    /**
+     * @return the balance
+     */
+    public Long getBalance() {
+        return balance;
+    }
+
+    /**
+     * @param balance the balance to set
+     */
+    public void setBalance(Long balance) {
+        this.balance = balance;
     }
 
     /**
@@ -75,17 +106,31 @@ public class Konto implements Serializable {
     }
 
     /**
-     * @return the balance
+     * @return the user
      */
-    public Long getBalance() {
-        return balance;
+    public User getUser() {
+        return user;
     }
 
     /**
-     * @param balance the balance to set
+     * @param user the user to set
      */
-    public void setBalance(Long balance) {
-        this.balance = balance;
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    /**
+     * @return the transactions
+     */
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    /**
+     * @param transactions the transactions to set
+     */
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
     }
     
 }

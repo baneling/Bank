@@ -8,16 +8,16 @@
     </h:head>
     <h:body>
         <h:form>
-            Nazwisko:
-            <h:inputText value=""></h:inputText> <br/>
+            Login:
+<!--            <h:inputText value=""></h:inputText> <br/>
             Hasło:
-            <h:inputSecret value=""></h:inputSecret>
-            <h:commandButton action="" value="Zaloguj"></h:commandButton><br/>
+            <h:inputSecret value=""></h:inputSecret>-->
+            <h:commandButton action="#{testBean.doSomething()}" value="Zaloguj"></h:commandButton><br/>
         </h:form>
         <br/>
-        <h:form>
+<!--        <h:form>
             <h:commandLink action="register" value="Zarejestruj nowe konto"></h:commandLink>
-        </h:form>
+        </h:form>-->
         <c:choose>
             <c:when test="${1 == 0}">
                nie ma
@@ -29,4 +29,3 @@
         </c:choose>
     </h:body>
 </html>
-

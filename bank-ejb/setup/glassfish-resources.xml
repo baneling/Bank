@@ -11,4 +11,5 @@
         <property name="driverClass" value="org.postgresql.Driver"/>
     </jdbc-connection-pool>
     <jdbc-resource enabled="true" jndi-name="java:bank" object-type="user" pool-name="post-gre-sql_bank_carbolymerPool"/>
+    <jdbc-resource enabled="true" jndi-name="bankPU" object-type="user" pool-name="post-gre-sql_bank_carbolymerPool"/>
 </resources>
