@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scene Scope="Project" version="2">
+    <Scope Scope="Faces Configuration Only">
+        <Node id="blogpostEdit.xhtml" x="150" y="150" zoom="true"/>
+        <Node id="blogEdit.xhtml" x="650" y="150" zoom="true"/>
+        <Node id="blogList.xhtml" x="374" y="37" zoom="true"/>
+        <Node id="blogDisplay.xhtml" x="400" y="300" zoom="true"/>
+    </Scope>
+    <Scope Scope="Project">
+        <Node id="index.xhtml" x="150" y="150" zoom="false"/>
+        <Node id="preferences.xhtml" x="425" y="196" zoom="true"/>
+    </Scope>
+    <Scope Scope="All Faces Configurations">
+        <Node id="blogpostEdit.xhtml" x="150" y="150" zoom="true"/>
+        <Node id="blogEdit.xhtml" x="650" y="150" zoom="true"/>
+        <Node id="blogList.xhtml" x="374" y="37" zoom="true"/>
+        <Node id="blogDisplay.xhtml" x="400" y="300" zoom="true"/>
+    </Scope>
+</Scene>
