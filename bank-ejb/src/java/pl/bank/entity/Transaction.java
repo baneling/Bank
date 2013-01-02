@@ -19,7 +19,7 @@ import javax.persistence.Table;
  * @author carbolymer
  */
 @Entity
-@Table(name="Transactions")
+@Table(name="transactions")
 @NamedQueries({
     @NamedQuery(
        name = "getTransactions", 

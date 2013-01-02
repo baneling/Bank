@@ -5,27 +5,31 @@
       xmlns:c="http://java.sun.com/jsp/jstl/core">
     <h:head>
         <title>SuperBank 1.0</title>
+        <h:outputStylesheet name="css/jsfcrud.css"/>
     </h:head>
     <h:body>
+        <c:if test="false">
+
+            <!--       <c:redirect url="/public/authError.html"/>-->
+        </c:if>   
         <h:form>
             Login:
-<!--            <h:inputText value=""></h:inputText> <br/>
+            <h:inputText value="#{authorization.login}"></h:inputText> <br/>
             Hasło:
-            <h:inputSecret value=""></h:inputSecret>-->
-            <h:commandButton action="#{testBean.doSomething()}" value="Zaloguj"></h:commandButton><br/>
+            <h:inputSecret value="#{authorization.password}"></h:inputSecret>
+            <h:commandButton action="#{authorization.Login}" value="Zaloguj"></h:commandButton><br/>
         </h:form>
         <br/>
-<!--        <h:form>
-            <h:commandLink action="register" value="Zarejestruj nowe konto"></h:commandLink>
-        </h:form>-->
+        <!--        <h:form>
+                    <h:commandLink action="register" value="Zarejestruj nowe konto"></h:commandLink>
+                </h:form>-->
         <c:choose>
-            <c:when test="${1 == 0}">
-               nie ma
-            </c:when>
-            <c:when test="${1 == 1}">
-               asdfhagsdfkjshgf
+            <c:when test="${(authorization.isError) and (authorization.login != null)}">
+                <h:outputText value="#{authorization.errorString}"></h:outputText>
             </c:when>
             <c:otherwise></c:otherwise>
         </c:choose>
     </h:body>
+
+
 </html>

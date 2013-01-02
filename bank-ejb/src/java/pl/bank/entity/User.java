@@ -5,6 +5,7 @@
 package pl.bank.entity;
 
 import java.io.Serializable;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Entity;
@@ -23,7 +24,7 @@ import javax.persistence.Table;
  * @author carbolymer
  */
 @Entity
-@Table(name="Users")
+@Table(name="users")
 @NamedQueries({
     @NamedQuery(
        name = "getUsers", 
@@ -32,7 +33,11 @@ import javax.persistence.Table;
     @NamedQuery(
         name = "findUsers",
         query="SELECT u FROM User u WHERE u.name LIKE :term OR u.surname LIKE :term OR u.login LIKE :term"
-    )
+    ),
+    @NamedQuery(
+        name = "findUserLoginPassword",
+        query="SELECT u FROM User u WHERE u.login = :login AND u.password = :password"
+    )        
 })
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -121,8 +126,8 @@ public class User implements Serializable {
     /**
      * @param password the password to set
      */
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPassword(String password) throws NoSuchAlgorithmException {
+        this.password = UserFacade.sha512(password);
     }
 
     /**
