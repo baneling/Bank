@@ -8,6 +8,8 @@ import java.security.NoSuchAlgorithmException;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpSession;
 import pl.bank.entity.User;
 import pl.bank.entity.UserFacade;
 import pl.bank.entity.UserType;
@@ -37,7 +39,9 @@ public class Authorization {
     
     public String Login() throws NoSuchAlgorithmException
     {
+        HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(true);
         user = userFacade.findByUsernamePassword(login, password);
+        session.setAttribute("user", user);
         if(user == null)
         {
             isError = true;
@@ -62,6 +66,7 @@ public class Authorization {
         user = null;
         login = null;
         password = null;
+        ((HttpSession)FacesContext.getCurrentInstance().getExternalContext().getSession(true)).setAttribute("user", null);
         return "index?faces-redirect=true";
     }
 
@@ -133,5 +138,10 @@ public class Authorization {
      */
     public void setUserFacade(UserFacade userFacade) {
         this.userFacade = userFacade;
+    }
+    
+    public void dupaDupa()
+    {
+        System.err.println("DUPA DUPA DUPA!!111");
     }
 }
