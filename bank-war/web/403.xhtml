@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core">
+    <h:head>
+        <title>Brak dostępu! - SuperBank 9000</title>
+       <h:outputStylesheet name="style.css"/>
+    </h:head>
+    <h:body>
+       <p:layout fullPage="true">
+            <p:layoutUnit position="north" size="147" style="overflow: hidden">
+                <ui:include src="template/header.xhtml"/>
+            </p:layoutUnit>
+            <p:layoutUnit position="center">
+                <p:panel header="Wiadomość" style="width:800px;margin:0 auto;">
+
+                    <h:graphicImage value="#{resource['403.png']}" style="float:left"/>
+                    <h2 style="margin: 50px;margin-left:200px;">Brak dostępu do żądanej strony!</h2>
+                    
+                </p:panel>
+            </p:layoutUnit>
+            <p:layoutUnit position="south" size="40">
+                <ui:include src="template/footer.xhtml"/>
+            </p:layoutUnit>
+        </p:layout>     
+    </h:body>
+</html>

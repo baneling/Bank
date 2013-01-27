@@ -10,15 +10,15 @@
     </filter>
     <filter-mapping>
         <filter-name>AccessControlFilter</filter-name>
-        <url-pattern>/faces/client.xhtml</url-pattern>
+        <url-pattern>/client.xhtml</url-pattern>
     </filter-mapping>
     <filter-mapping>
         <filter-name>AccessControlFilter</filter-name>
-        <url-pattern>/faces/cashier.xhtml</url-pattern>
+        <url-pattern>/cashier.xhtml</url-pattern>
     </filter-mapping>
     <filter-mapping>
         <filter-name>AccessControlFilter</filter-name>
-        <url-pattern>/faces/administrator.xhtml</url-pattern>
+        <url-pattern>/administrator.xhtml</url-pattern>
     </filter-mapping>
     <servlet>
         <servlet-name>Faces Servlet</servlet-name>
@@ -27,7 +27,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>Faces Servlet</servlet-name>
-        <url-pattern>/faces/*</url-pattern>
+        <url-pattern>*.xhtml</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
@@ -35,14 +35,22 @@
         </session-timeout>
     </session-config>
     <welcome-file-list>
-        <welcome-file>faces/index.xhtml</welcome-file>
+        <welcome-file>index.xhtml</welcome-file>
     </welcome-file-list>
     <error-page>
         <error-code>404</error-code>
-        <location>/error_pages/404.xhtml</location>
+        <location>/404.xhtml</location>
     </error-page>
     <error-page>
         <error-code>403</error-code>
-        <location>/error_pages/403.xhtml</location>
+        <location>/403.xhtml</location>
+    </error-page>
+    <context-param>
+        <param-name>primefaces.THEME</param-name>
+        <param-value>bootstrap</param-value>
+    </context-param>
+    <error-page>
+        <exception-type>com.sun.faces.context.FacesFileNotFoundException</exception-type>
+        <location>/404.xhtml</location>
     </error-page>
 </web-app>

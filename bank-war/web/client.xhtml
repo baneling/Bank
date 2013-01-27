@@ -1,15 +1,45 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://java.sun.com/jsf/html">
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
     <h:head>
         <title>Panel Klienta</title>
+        <h:outputStylesheet name="style.css"/>
     </h:head>
     <h:body>
-    <h:form>
-        <h:commandLink action="#{authorization.Logout}" value="Wyloguj się" />
-    </h:form>
-        Hello from Facelets
+        <p:layout fullPage="true">
+            <p:layoutUnit position="north" size="147" style="overflow: hidden">
+                <ui:include src="template/header.xhtml"/>
+            </p:layoutUnit>
+            <p:layoutUnit position="center">
+                
+                <p:tabView>
+                <p:tab title="Portfel">
+                    Witaj <b><h:outputText value="#{authorization.user.name}" />&nbsp;<h:outputText value="#{authorization.user.surname}"/></b>.
+                    <br/>
+                    Twoje konta:
+
+                </p:tab>
+                <p:tab title="Ustawienia">
+                    <h:outputText value="Ipsum" />
+                </p:tab>
+                <p:tab title="Koniec sesji">
+                    Aby zakończyć sesję użyj poniższego przycisku:
+                    <div style="display:block; text-align: center">
+                        <h:form>
+                            <p:commandButton action="#{authorization.Logout()}" value="Zakończ sesję"/>
+                        </h:form>
+                    </div>
+                </p:tab>
+                </p:tabView>
+                
+            </p:layoutUnit>
+            <p:layoutUnit position="south" size="40">
+                <ui:include src="template/footer.xhtml"/>
+            </p:layoutUnit>
+        </p:layout>
     </h:body>
 </html>
 

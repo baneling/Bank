@@ -44,15 +44,17 @@ public class AccessControlFilter implements Filter {
         HttpServletResponse hre = (HttpServletResponse) response;
         HttpSession session = hrq.getSession(true);
         User user = (User) session.getAttribute("user");
+        log("servlet: "+hrq.getServletPath());
+        log("context: "+hrq.getContextPath());
         if(user == null)
             hre.sendError(403);
         else
         {
             log(">>> welcome: "+user.getName()+" ("+user.getLogin()+") userType: "+user.getUserType());
-            if(hrq.getRequestURI().equals("/bank-war/faces/administrator.xhtml"))
+            if(hrq.getRequestURI().equals("/bank-war/administrator.xhtml"))
                 if(user.getUserType() != UserType.ADMINISTRATOR)
                     hre.sendError(403);
-            if(hrq.getRequestURI().equals("/bank-war/faces/cashier.xhtml"))
+            if(hrq.getRequestURI().equals("/bank-war/cashier.xhtml"))
                 if(user.getUserType() != UserType.CASHIER)
                     hre.sendError(403);
         }

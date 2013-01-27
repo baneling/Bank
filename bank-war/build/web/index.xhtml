@@ -2,34 +2,53 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:c="http://java.sun.com/jsp/jstl/core">
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core">
     <h:head>
-        <title>SuperBank 1.0</title>
-        <h:outputStylesheet name="css/jsfcrud.css"/>
+        <title>SuperBank 9000</title>
+        <h:outputStylesheet name="style.css"/>
     </h:head>
     <h:body>
-        <c:if test="false">
+       <p:layout fullPage="true">
+            <p:layoutUnit position="north" size="147" style="overflow: hidden">
+                <ui:include src="template/header.xhtml"/>
+            </p:layoutUnit>
+            <p:layoutUnit position="center">
+                <p:panel header="Logowanie" style="width:300px;margin:0 auto;">
 
-            <!--       <c:redirect url="/public/authError.html"/>-->
-        </c:if>   
-        <h:form>
-            Login:
-            <h:inputText value="#{authorization.login}"></h:inputText> <br/>
-            Hasło:
-            <h:inputSecret value="#{authorization.password}"></h:inputSecret>
-            <h:commandButton action="#{authorization.Login}" value="Zaloguj"></h:commandButton><br/>
-        </h:form>
-        <br/>
-        <!--        <h:form>
-                    <h:commandLink action="register" value="Zarejestruj nowe konto"></h:commandLink>
-                </h:form>-->
-        <c:choose>
-            <c:when test="${(authorization.isError) and (authorization.login != null)}">
-                <h:outputText value="#{authorization.errorString}"></h:outputText>
-            </c:when>
-            <c:otherwise></c:otherwise>
-        </c:choose>
+                    <h:form>
+                    <p:messages/>
+                    <h:panelGrid columns="2">
+                        <h:outputLabel value="Login:"/>
+                        <p:inputText
+                            id="login"
+                            value="#{authorization.login}"
+                            required="true"
+                            label="Login"
+                            requiredMessage="Musisz podać login!">
+                            <f:validateLength minimum="1" for="login"/>
+                        </p:inputText>
+                      
+                        <h:outputLabel value="Hasło:"/>
+                        <p:password
+                            id="password"
+                            value="#{authorization.password}"
+                            required="true"
+                            label="Password"
+                            requiredMessage="Musisz podać hasło!">
+                            <f:validateLength minimum="1" for="password"/>
+                        </p:password>
+                    </h:panelGrid>
+                    <p:commandButton id="button" value="Zaloguj się" action="#{authorization.Login()}" ajax="false"/>  
+                    </h:form>
+                    
+                </p:panel>
+            </p:layoutUnit>
+            <p:layoutUnit position="south" size="40">
+                <ui:include src="template/footer.xhtml"/>
+            </p:layoutUnit>
+        </p:layout>     
     </h:body>
-
-
 </html>

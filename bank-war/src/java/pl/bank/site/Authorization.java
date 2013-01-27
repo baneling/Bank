@@ -6,6 +6,7 @@ package pl.bank.site;
 
 import java.security.NoSuchAlgorithmException;
 import javax.ejb.EJB;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
@@ -24,8 +25,6 @@ public class Authorization {
 
     private String login;
     private String password;
-    private Boolean isError = false;
-    private String errorString;
     @EJB
     private UserFacade userFacade;
     
@@ -34,25 +33,23 @@ public class Authorization {
      * Creates a new instance of Authorization
      */
     public Authorization() {
-        isError = false;
     }
     
     public String Login() throws NoSuchAlgorithmException
     {
         HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(true);
         user = userFacade.findByUsernamePassword(login, password);
-        session.setAttribute("user", user);
-        if(user == null)
+        session.setAttribute("user", getUser());
+        if(getUser() == null)
         {
-            isError = true;
-            errorString = "Nie ma takiego użytkownika";
-            return "index?faces-redirect=true";
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_FATAL,"Niepoprawna nazwa użytkownika lub hasło!", ""));
+            return "index";
         }
-        else if(user.getUserType() == UserType.ADMINISTRATOR)
+        else if(getUser().getUserType() == UserType.ADMINISTRATOR)
         {
             return "administrator?faces-redirect=true";
         }
-        else if(user.getUserType() == UserType.CASHIER)
+        else if(getUser().getUserType() == UserType.CASHIER)
         {
             return "cashier?faces-redirect=true";
         }
@@ -99,34 +96,6 @@ public class Authorization {
     }
 
     /**
-     * @return the isError
-     */
-    public Boolean getIsError() {
-        return isError;
-    }
-
-    /**
-     * @param isError the isError to set
-     */
-    public void setIsError(Boolean isError) {
-        this.isError = isError;
-    }
-
-    /**
-     * @return the errorString
-     */
-    public String getErrorString() {
-        return errorString;
-    }
-
-    /**
-     * @param errorString the errorString to set
-     */
-    public void setErrorString(String errorString) {
-        this.errorString = errorString;
-    }
-
-    /**
      * @return the userFacade
      */
     public UserFacade getUserFacade() {
@@ -139,9 +108,11 @@ public class Authorization {
     public void setUserFacade(UserFacade userFacade) {
         this.userFacade = userFacade;
     }
-    
-    public void dupaDupa()
-    {
-        System.err.println("DUPA DUPA DUPA!!111");
+
+    /**
+     * @return the user
+     */
+    public User getUser() {
+        return user;
     }
 }
