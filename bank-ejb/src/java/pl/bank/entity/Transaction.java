@@ -5,6 +5,7 @@
 package pl.bank.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -13,6 +14,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -29,8 +32,12 @@ import javax.persistence.Table;
 public class Transaction implements Serializable {
     @ManyToOne
     private Account account;
-    private String source;
+    private float amount;
+    private String secondSide;
     private String description;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date completionDate;
+    private TransactionType type;
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -84,20 +91,6 @@ public class Transaction implements Serializable {
     }
 
     /**
-     * @return the source
-     */
-    public String getSource() {
-        return source;
-    }
-
-    /**
-     * @param source the source to set
-     */
-    public void setSource(String source) {
-        this.source = source;
-    }
-
-    /**
      * @return the description
      */
     public String getDescription() {
@@ -110,5 +103,79 @@ public class Transaction implements Serializable {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    /**
+     * @return the amount
+     */
+    public float getAmount() {
+        if(type == TransactionType.INCOMING || amount == 0f)
+            return amount;
+        else
+            return amount*(-1f);
+    }
+
+    /**
+     * @param amount the amount to set
+     */
+    public void setAmount(float amount) {
+        this.amount = amount;
+    }
+
+    /**
+     * @return the completionDate
+     */
+    public Date getCompletionDate() {
+        return completionDate;
+    }
+
+    /**
+     * @param completionDate the completionDate to set
+     */
+    public void setCompletionDate(Date completionDate) {
+        this.completionDate = completionDate;
+    }
+
+    /**
+     * @return the secondSide
+     */
+    public String getSecondSide() {
+        return secondSide;
+    }
+
+    /**
+     * @param secondSide the secondSide to set
+     */
+    public void setSecondSide(String secondSide) {
+        this.secondSide = secondSide;
+    }
+
+    /**
+     * @return the transactionType
+     */
+    public TransactionType getType() {
+        return type;
+    }
+
+    /**
+     * @param transactionType the transactionType to set
+     */
+    public void setType(TransactionType transactionType) {
+        this.type = transactionType;
+    }
     
+    public String getRecipient()
+    {
+        if(type == TransactionType.INCOMING)
+            return account.getUser().getName()+" "+account.getUser().getSurname();
+        else
+            return secondSide;
+    }
+    
+    public String getSender()
+    {
+        if(type == TransactionType.INCOMING)
+            return secondSide;
+        else
+            return account.getUser().getName()+" "+account.getUser().getSurname();
+    }    
 }

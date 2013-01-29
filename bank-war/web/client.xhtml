@@ -3,7 +3,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:pe="http://primefaces.org/ui/extensions">
     <h:head>
         <title>Panel Klienta</title>
         <h:outputStylesheet name="style.css"/>
@@ -13,14 +16,139 @@
             <p:layoutUnit position="north" size="147" style="overflow: hidden">
                 <ui:include src="template/header.xhtml"/>
             </p:layoutUnit>
-            <p:layoutUnit position="center">
-                
+            <p:layoutUnit position="center">             
                 <p:tabView>
                 <p:tab title="Portfel">
-                    Witaj <b><h:outputText value="#{authorization.user.name}" />&nbsp;<h:outputText value="#{authorization.user.surname}"/></b>.
-                    <br/>
-                    Twoje konta:
+                    Witaj <b><h:outputText value="#{authorization.user.name}" />&nbsp;<h:outputText value="#{authorization.user.surname}"/></b>.<br/>
+                    Adres zamieszkania: <h:outputText value="#{authorization.user.address}"/>
+                    <br/><br/>
+                    <c:choose>
+                        <c:when test="#{authorization.user.accounts.size() != 0}">
+                            Twoje konta:
+                            <p:accordionPanel var="account" value="#{authorization.user.accounts.toArray()}" >                     
+                                <p:tab title="Konto numer: #{account.number}">
+                                        <h:outputText value="Bilans: #{account.balance} PLN"/>
+                                       
+                                        <p:commandButton id="accountDetailsBtn" value="Historia transakcji" style="float:right"/>  
+                                        <p:overlayPanel id="accountDetailsPanel" for="accountDetailsBtn" hideEffect="fade" dynamic="true" appendToBody="true">  
+                                         <!-- HISTORIA TRANSAKCJI -->
+                                            <p:dataTable
+                                                id="accountDetailsTable"
+                                                var="transaction"
+                                                value="#{account.transactionsList}"
+                                                rows="15"
+                                                paginator="true"
+                                                emptyMessage="Brak transakcji dla tego konta">
 
+                                                <p:column sortBy="#{transaction.sender}"> 
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Z rachunku" />  
+                                                    </f:facet>
+                                                    <h:outputText value="#{transaction.sender}"/>
+                                                </p:column>
+
+                                                <p:column sortBy="#{transaction.recipient}"> 
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Na rachunek" />  
+                                                    </f:facet>
+                                                    <h:outputText value="#{transaction.recipient}"/>
+                                                </p:column>
+                                                
+                                                <p:column sortBy="#{transaction.description}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Tytułem" />  
+                                                    </f:facet>
+                                                    <h:outputText value="#{transaction.description}" />
+                                                </p:column>
+
+                                                <p:column sortBy="#{transaction.amount}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Kwota" />  
+                                                    </f:facet>                                                           
+                                                    <h:outputText value="#{transaction.amount} PLN" />  
+                                                </p:column>
+                                                
+                                                <p:column sortBy="#{transaction.amount}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Data" />
+                                                    </f:facet>                                                           
+                                                    <h:outputText value="#{transaction.completionDate}" />  
+                                                </p:column>                                            
+                                            </p:dataTable>  
+                                        </p:overlayPanel>
+                                        
+                                        <p:commandButton id="accountNewTransactionBtn" value="Nowy przelew" style="float:right">
+                                            <f:setPropertyActionListener value="#{account.number}" target="#{newTransaction.senderAccountNumber}" />
+                                        </p:commandButton>
+                                        <p:overlayPanel
+                                            id="newTransactionPanel"
+                                            for="accountNewTransactionBtn"
+                                            hideEffect="fade"
+                                            dynamic="true"
+                                            appendToBody="true"
+                                            style="width:800px">  
+                                        <!-- NOWY PRZELEW-->
+                                            <h:form id="newTransactionForm">
+                                                <p:panel id="newTransactionPanel">
+                                                <p:messages />  
+                                                <h:panelGrid columns="3" id="newTransactionGrid" style="margin-left: 20px; margin-right: 20px;">
+                                                    <h:outputLabel value="Numer konta nadawcy:"/>
+                                                    <p:inputText
+                                                        id="senderAccountNumber"
+                                                        value="#{account.number}"
+                                                        disabled="true">
+                                                    </p:inputText>
+                                                    <p:message for="senderAccountNumber" display="icon"/>   
+                                                    
+                                                    <h:outputLabel value="Numer konta odbiorcy:"/>
+                                                    <p:inputMask
+                                                        id="recipientAccountNumber"
+                                                        value="#{newTransaction.accountNumber}"
+                                                        required="true"
+                                                        requiredMessage="Musisz podać numer konta!"
+                                                        mask="999999999">
+                                                    </p:inputMask>
+                                                    <p:message for="recipientAccountNumber" display="icon"/> 
+
+                                                    <h:outputLabel value="Kwota:"/>
+                                                    <pe:inputNumber id="amount" value="#{newTransaction.amount}" symbol=" PLN" symbolPosition="s"  
+                                                                    decimalSeparator="," thousandSeparator="." validatorMessage="Kwota musi być wyższa niż 0 PLN.">
+                                                        <f:validateDoubleRange minimum="0.01"/>
+                                                    </pe:inputNumber>
+                                                    <p:message for="amount" display="icon"/>                                                     
+
+                                                    <h:outputLabel value="Tytułem:"/>
+                                                    <p:inputTextarea
+                                                        id="description"
+                                                        value="#{newTransaction.description}"
+                                                        required="true"
+                                                        rows="5"
+                                                        cols="50"
+                                                        requiredMessage="Musisz wypełnić pole &quot;Tytułem&quot;!"
+                                                        validatorMessage="Pole &quot;Tytułem&quot; może mieć tylko od 2 do 255 znaków.">
+                                                        <f:validateLength minimum="2" maximum="255"/> 
+                                                    </p:inputTextarea>
+                                                    <p:message for="description" display="icon"/>                                                         
+                                                    
+                                                    <p:commandButton value="Wyślij przelew"
+                                                                     update="newTransactionPanel"   
+                                                                     actionListener="#{newTransaction.send}"/>
+                                                    <p:commandButton 
+                                                                     value="Wyczyść"
+                                                                     process="@this" 
+                                                                     update="newTransactionGrid"   
+                                                                     actionListener="#{newTransaction.reset()}">
+                                                        <p:resetInput target="newTransactionGrid" />
+                                                    </p:commandButton>                                                  
+                                                </h:panelGrid>
+                                                </p:panel>
+                                            </h:form>
+                                        </p:overlayPanel>
+                                </p:tab>
+                            </p:accordionPanel>
+                        </c:when>
+                        <c:otherwise>Nie masz żadnych zarejestrowanych kont. Skontaktuj się z kasjerem.</c:otherwise>
+                    </c:choose>
                 </p:tab>
                 <p:tab title="Ustawienia">
                     <h:outputText value="Ipsum" />
@@ -34,12 +162,11 @@
                     </div>
                 </p:tab>
                 </p:tabView>
-                
             </p:layoutUnit>
             <p:layoutUnit position="south" size="40">
                 <ui:include src="template/footer.xhtml"/>
             </p:layoutUnit>
-        </p:layout>
+        </p:layout>          
     </h:body>
 </html>
 

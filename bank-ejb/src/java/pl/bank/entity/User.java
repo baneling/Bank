@@ -6,11 +6,12 @@ package pl.bank.entity;
 
 import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -49,11 +50,12 @@ public class User implements Serializable {
     private String surname;
     private String login;
     private String password;
+    private String address;
     @Enumerated(EnumType.STRING)
     private UserType userType;
     
-    @OneToMany(mappedBy = "user")
-    private List<Account> accounts = new ArrayList<Account>();
+    @OneToMany(mappedBy = "user", fetch= FetchType.EAGER)
+    private Set<Account> accounts = new HashSet<Account>();
 
     public Long getId() {
         return id;
@@ -147,14 +149,14 @@ public class User implements Serializable {
     /**
      * @return the accounts
      */
-    public List<Account> getAccounts() {
+    public Set<Account> getAccounts() {
         return accounts;
     }
 
     /**
      * @param accounts the accounts to set
      */
-    public void setAccounts(List<Account> accounts) {
+    public void setAccounts(Set<Account> accounts) {
         this.accounts = accounts;
     }
 
@@ -170,5 +172,19 @@ public class User implements Serializable {
      */
     public void setUserType(UserType userType) {
         this.userType = userType;
+    }
+
+    /**
+     * @return the address
+     */
+    public String getAddress() {
+        return address;
+    }
+
+    /**
+     * @param address the address to set
+     */
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

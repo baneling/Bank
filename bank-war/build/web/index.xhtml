@@ -16,11 +16,11 @@
                 <ui:include src="template/header.xhtml"/>
             </p:layoutUnit>
             <p:layoutUnit position="center">
-                <p:panel header="Logowanie" style="width:300px;margin:0 auto;">
+                <p:panel header="Logowanie" style="width:280px;margin:0 auto;">
 
                     <h:form>
                     <p:messages/>
-                    <h:panelGrid columns="2">
+                    <h:panelGrid columns="2" style="margin-left: 20px; margin-right: 20px;">
                         <h:outputLabel value="Login:"/>
                         <p:inputText
                             id="login"
@@ -40,8 +40,10 @@
                             requiredMessage="Musisz podać hasło!">
                             <f:validateLength minimum="1" for="password"/>
                         </p:password>
+                        <h:outputText value=""/>
+                        <p:commandButton id="button" value="Zaloguj się" action="#{authorization.Login()}" ajax="false"/>  
                     </h:panelGrid>
-                    <p:commandButton id="button" value="Zaloguj się" action="#{authorization.Login()}" ajax="false"/>  
+                    
                     </h:form>
                     
                 </p:panel>

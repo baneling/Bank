@@ -38,7 +38,7 @@ public class Authorization {
     public String Login() throws NoSuchAlgorithmException
     {
         HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(true);
-        user = userFacade.findByUsernamePassword(login, password);
+        setUser(userFacade.findByUsernamePassword(login, password));
         session.setAttribute("user", getUser());
         if(getUser() == null)
         {
@@ -60,7 +60,7 @@ public class Authorization {
     }
     public String Logout()
     {
-        user = null;
+        setUser(null);
         login = null;
         password = null;
         ((HttpSession)FacesContext.getCurrentInstance().getExternalContext().getSession(true)).setAttribute("user", null);
@@ -114,5 +114,12 @@ public class Authorization {
      */
     public User getUser() {
         return user;
+    }
+
+    /**
+     * @param user the user to set
+     */
+    public void setUser(User user) {
+        this.user = user;
     }
 }

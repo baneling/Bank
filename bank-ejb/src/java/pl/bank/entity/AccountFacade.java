@@ -39,9 +39,13 @@ public class AccountFacade extends AbstractFacade<Account> {
     }   
      
     public Account getByNumber(Long number){
-            Query q = em.createNamedQuery("findByNumber"); 
-            q.setParameter("number", number);
+        Query q = em.createNamedQuery("findByNumber"); 
+        q.setParameter("number", number);
+        try {
             return (Account)q.getSingleResult(); 
+        } catch (javax.persistence.NoResultException ex) {
+            return null;
+        }        
     }
     
 }

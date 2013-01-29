@@ -6,8 +6,10 @@ package pl.bank.entity;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -15,6 +17,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 
 /**
  *
@@ -38,11 +41,12 @@ public class Account implements Serializable {
     private Long id;
     
     private Long number;
-    private Long balance;
+    private float balance;
     @ManyToOne
     private User user;
-    @OneToMany(mappedBy = "account")
-    private List<Transaction> transactions = new ArrayList<Transaction>();
+    @OneToMany(mappedBy = "account", fetch= FetchType.EAGER)
+    @OrderBy("completionDate DESC")    
+    private Set<Transaction> transactions = new HashSet<Transaction>();
 
     public Long getId() {
         return id;
@@ -80,14 +84,14 @@ public class Account implements Serializable {
     /**
      * @return the balance
      */
-    public Long getBalance() {
+    public float getBalance() {
         return balance;
     }
 
     /**
      * @param balance the balance to set
      */
-    public void setBalance(Long balance) {
+    public void setBalance(float balance) {
         this.balance = balance;
     }
 
@@ -122,14 +126,18 @@ public class Account implements Serializable {
     /**
      * @return the transactions
      */
-    public List<Transaction> getTransactions() {
+    public Set<Transaction> getTransactions() {
         return transactions;
     }
 
+    public ArrayList<Transaction> getTransactionsList() {
+        return new ArrayList<Transaction>(transactions);
+    }
+    
     /**
      * @param transactions the transactions to set
      */
-    public void setTransactions(List<Transaction> transactions) {
+    public void setTransactions(Set<Transaction> transactions) {
         this.transactions = transactions;
     }
     

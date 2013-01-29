@@ -43,9 +43,12 @@ public class UserFacade extends AbstractFacade<User> {
             q.setParameter("term", searchTerm);
             return q.getResultList();
         }else{
-            return em.createNamedQuery("getUsers").getResultList();
-        }
-        
+            try{
+                return em.createNamedQuery("getUsers").getResultList();
+            } catch (javax.persistence.NoResultException ex) {
+                return null;
+            }
+        }    
     }
     
     public User findByUsernamePassword(String login, String password) throws NoSuchAlgorithmException

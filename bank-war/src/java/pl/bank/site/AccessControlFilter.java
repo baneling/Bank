@@ -51,10 +51,10 @@ public class AccessControlFilter implements Filter {
         else
         {
             log(">>> welcome: "+user.getName()+" ("+user.getLogin()+") userType: "+user.getUserType());
-            if(hrq.getRequestURI().equals("/bank-war/administrator.xhtml"))
+            if(hrq.getServletPath().equals("/administrator.xhtml"))
                 if(user.getUserType() != UserType.ADMINISTRATOR)
                     hre.sendError(403);
-            if(hrq.getRequestURI().equals("/bank-war/cashier.xhtml"))
+            if(hrq.getServletPath().equals("/cashier.xhtml"))
                 if(user.getUserType() != UserType.CASHIER)
                     hre.sendError(403);
         }
