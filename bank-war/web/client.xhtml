@@ -129,15 +129,16 @@
                                                         <f:validateLength minimum="2" maximum="255"/> 
                                                     </p:inputTextarea>
                                                     <p:message for="description" display="icon"/>                                                         
-                                                    
-                                                    <p:commandButton value="Wyślij przelew"
-                                                                     update="newTransactionPanel"   
-                                                                     actionListener="#{newTransaction.send}"/>
+
+                                                    <p:commandButton
+                                                        value="Wyślij przelew"
+                                                        update="newTransactionPanel"   
+                                                        actionListener="#{newTransaction.send}"/>
                                                     <p:commandButton 
-                                                                     value="Wyczyść"
-                                                                     process="@this" 
-                                                                     update="newTransactionGrid"   
-                                                                     actionListener="#{newTransaction.reset()}">
+                                                        value="Wyczyść"
+                                                        process="@this" 
+                                                        update="newTransactionGrid"   
+                                                        actionListener="#{newTransaction.reset()}">
                                                         <p:resetInput target="newTransactionGrid" />
                                                     </p:commandButton>                                                  
                                                 </h:panelGrid>
@@ -149,9 +150,6 @@
                         </c:when>
                         <c:otherwise>Nie masz żadnych zarejestrowanych kont. Skontaktuj się z kasjerem.</c:otherwise>
                     </c:choose>
-                </p:tab>
-                <p:tab title="Ustawienia">
-                    <h:outputText value="Ipsum" />
                 </p:tab>
                 <p:tab title="Koniec sesji">
                     Aby zakończyć sesję użyj poniższego przycisku:

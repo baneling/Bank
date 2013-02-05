@@ -4,6 +4,8 @@
  */
 package pl.bank.entity;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author carbolymer
@@ -11,5 +13,27 @@ package pl.bank.entity;
 public enum UserType {
     CLIENT,
     CASHIER,
-    ADMINISTRATOR
+    ADMINISTRATOR;
+    public ArrayList<UserType> getAllTypes()
+    {
+        ArrayList<UserType> types = new ArrayList<UserType>();
+        types.add(UserType.CLIENT);
+        types.add(UserType.CASHIER);
+        types.add(UserType.ADMINISTRATOR);
+        return types;
+    }
+    
+    public String getValue()
+    {
+        if (this == UserType.CLIENT) {
+            return "CLIENT";
+        }
+        if (this == UserType.CASHIER) {
+            return "CASHIER";
+        }
+        if (this == UserType.ADMINISTRATOR) {
+            return "ADMINISTRATOR";
+        }
+        return null;
+    }
 }

@@ -15,6 +15,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import pl.bank.entity.User;
 import pl.bank.entity.UserFacade;
+import pl.bank.entity.UserType;
 
 /**
  *
@@ -51,6 +52,7 @@ public class NewClient {
             user.setSurname(surname);
             user.setAddress(address);
             user.setPassword(password);
+            user.setUserType(UserType.CLIENT);
             userFacade.save(user);
             reset(event);
             message = new FacesMessage(FacesMessage.SEVERITY_INFO,"Konto zostało pomyślnie założone.", "");

@@ -19,6 +19,7 @@ import pl.bank.entity.User;
 public class Container implements Serializable{
     private long accountNumber;
     private long userId;
+    private String password;
     /**
      * Creates a new instance of Container
      */
@@ -51,5 +52,19 @@ public class Container implements Serializable{
      */
     public void setUserId(long userId) {
         this.userId = userId;
+    }
+
+    /**
+     * @return the password
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * @param password the password to set
+     */
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

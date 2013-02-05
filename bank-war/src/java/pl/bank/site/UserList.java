@@ -8,6 +8,7 @@ import java.awt.geom.Arc2D;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Array;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -19,6 +20,7 @@ import javax.faces.bean.RequestScoped;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.model.SelectItem;
 import org.primefaces.event.RowEditEvent;
 import pl.bank.entity.Account;
 import pl.bank.entity.AccountFacade;
@@ -43,7 +45,7 @@ public class UserList implements Serializable{
     private UserFacade userFacade;    
     @ManagedProperty("#{authorization}")
     private Authorization authorizationBean; 
-    private List<User> users = new ArrayList<User>();
+    private List<User> users = new ArrayList<User>();;
     
     @ManagedProperty("#{container}")
     private Container container;
@@ -64,17 +66,21 @@ public class UserList implements Serializable{
     }
     
     public List<User> getUsers(boolean forceReload) {
-        if(users.size() > 0 && !forceReload)
+        if (users.size() > 0 && !forceReload) {
             return users;
-        if(authorizationBean.getUser().getUserType() == UserType.CASHIER)    
+        }
+        if (authorizationBean.getUser().getUserType() == UserType.CASHIER) {
             users = userFacade.findByType(UserType.CLIENT);
-        else if(authorizationBean.getUser().getUserType() == UserType.ADMINISTRATOR)
+        } else if (authorizationBean.getUser().getUserType() == UserType.ADMINISTRATOR) {
             users = userFacade.findByLogin(null);
-        else
+        } else {
             users = new ArrayList<User>();
+        }
         filteredUsers = users;
         return users;
     }
+    
+    
 
     /**
      * @param users the users to set
@@ -142,11 +148,9 @@ public class UserList implements Serializable{
     
     public void deleteAccount(ActionEvent event) throws IOException
     {
-        System.err.println("EXECUTIN!");
         Account account = accountFacade.getByNumber((Long)event.getComponent().getAttributes().get("accountNumber"));
         if(account == null)
         {
-            System.err.println("NULL!!!"+event.getComponent().getAttributes().get("accountNumber"));
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_FATAL,"Błąd", "Nie można było usunąć konta o numerze "+account.getNumber()+"."));
             return;
         }
@@ -163,7 +167,6 @@ public class UserList implements Serializable{
     public void addNewAccount(ActionEvent event)
     {
         User user = userFacade.findById((Long)event.getComponent().getAttributes().get("userId"));
-        System.err.println(user.getId());
         long signature = (long)1e8;
         long number = 0l;
         Account account;
@@ -180,11 +183,32 @@ public class UserList implements Serializable{
         accountFacade.save(account);
         getUsers(true);
     }
+
+    public SelectItem[] getUserTypes() {
+        SelectItem[] items = new SelectItem[UserType.CLIENT.getAllTypes().size()];
+        int i = 0;
+        for (UserType type : UserType.CLIENT.getAllTypes()) {
+            items[i++] = new SelectItem(type, decodeUserType(type));
+        }
+        return items;
+    }
     /**
      * @return the container
      */
     public Container getContainer() {
         return container;
+    }
+    
+    public String decodeUserType(UserType type) {
+        switch (type) {
+            case CLIENT:
+                return "Klient";
+            case CASHIER:
+                return "Kasjer";
+            case ADMINISTRATOR:
+                return "Administrator";
+        }
+        return null;
     }
 
     /**
@@ -192,5 +216,47 @@ public class UserList implements Serializable{
      */
     public void setContainer(Container container) {
         this.container = container;
+    }
+    
+    public void updatePassword(ActionEvent event) throws NoSuchAlgorithmException
+    {
+        User u = userFacade.findById(container.getUserId());
+        u.setPassword(container.getPassword());
+        userFacade.save(u);
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Sukces - hasło zostało zmienione", ""));
+        resetPasswordForm();
+    }
+    
+    public void deleteUser(ActionEvent event)
+    {
+        User user = userFacade.findById(container.getUserId());
+        if (user != null) {
+            Set<Account> accounts = user.getAccounts();
+            for (Account account : accounts) {
+                if (account != null) {
+                    Set<Transaction> trs = account.getTransactions();
+                    for (Transaction transaction : trs) {
+                        transactionFacade.remove(transaction);
+                    }
+                    accountFacade.remove(account);
+                }
+            }
+            user.setAccounts(null);
+            userFacade.remove(user);
+
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Sukces", "Użytkownik "+user.getName()+" został usunięty"));
+            getUsers(true);
+        }
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Błąd", "Nie można było usunąć użytkownika "+user.getName()+"."));
+    }
+    
+    public void resetPasswordForm()
+    {
+        container.setPassword("");
+    }
+    
+    public void interceptUserId(ActionEvent event)
+    {
+        container.setUserId((Long)event.getComponent().getAttributes().get("userId"));
     }
 }

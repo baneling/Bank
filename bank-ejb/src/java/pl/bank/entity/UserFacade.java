@@ -62,6 +62,10 @@ public class UserFacade extends AbstractFacade<User> {
         return u;
     }
     
+    public List<User> findAll() {
+        return findByLogin(null);
+    }
+
     public List<User> findByLogin(String login){
         if(login != null){
             Query q = em.createNamedQuery("findByLogin"); 

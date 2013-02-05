@@ -32,13 +32,68 @@
                                     filteredValue="#{userList.filteredUsers}"
                                     editable="true"
                                     editMode="row"
-                                    emptyMessage="Brak klientów spełniających wymagane kryteria.">
+                                    emptyMessage="Brak klientów spełniających wymagane kryteria."                                
+                                    rows="15"
+                                    paginator="true">
                                 <p:ajax event="rowEdit" listener="#{userList.onEdit}" update=":menuTabs:clientList:messages" />
                                 <p:ajax event="rowEditCancel" listener="#{userList.onCancel}" update=":menuTabs:clientList:messages" />                               
                                 <p:column style="width:16px">  
                                     <p:rowToggler />
                                 </p:column>
-                                <p:column>  
+                                <p:column style="width: 46px">
+                                    <p:dialog id="passwordChangeDialog" header="Zmiana hasła" widgetVar="pwdDlg" modal="true" appendToBody="true" >
+                                        <p:ajax event="close" update=":menuTabs:clientList:usersList:pwdChgForm:pwdChgMsg"/>                                 
+                                        <h:form id="pwdChgForm">
+                                        <p:panel id="passwordChangePanel">
+                                            <h:outputText value="Zmiana hasła dla użytkownika  #{user.name} #{user.surname} (#{user.login}):"/>
+                                            <p:messages id="pwdChgMsg" autoUpdate="true"/>
+                                            <h:panelGrid columns="3" id="passwordChangeGrid">
+                                                <h:outputLabel value="Hasło: "/>
+                                                <p:password
+                                                    id="pwd_userPassword1"
+                                                    value="#{container.password}"
+                                                    match="pwd_userPassword2"
+                                                    required="true"
+                                                    requiredMessage="Musisz wypełnić pole &quot;Hasło&quot;!"
+                                                    validatorMessage="Pole &quot;hasło&quot; może mieć tylko od 5 do 64 znaków.">
+                                                    <f:validateLength minimum="5" maximum="64"/> 
+                                                </p:password>
+                                                <p:message for="pwd_userPassword1" display="icon"/>
+
+                                                <h:outputLabel value="Powtórz hasło:"/>
+                                                <p:password
+                                                    id="pwd_userPassword2"
+                                                    value="#{container.password}"
+                                                    required="true"
+                                                    requiredMessage="Musisz wypełnić pole &quot;Powtórz hasło&quot;!"
+                                                    validatorMessage="Pole &quot;Powtórz hasło&quot; może mieć tylko od 5 do 64 znaków.">
+                                                    <f:validateLength minimum="5" maximum="64"/> 
+                                                </p:password>
+                                                <p:message for="pwd_userPassword2" display="icon"/>                                    
+
+                                                <p:commandButton
+                                                    value="Zmień hasło"
+                                                    update="passwordChangePanel"
+                                                    process="@form"
+                                                    actionListener="#{userList.updatePassword}" ajax="true"/>
+                                                <p:commandButton 
+                                                    value="Wyczyść formularz"
+                                                    process="@this" 
+                                                    update="passwordChangeGrid"   
+                                                    actionListener="#{userList.resetPasswordForm}">
+                                                    <p:resetInput target="passwordChangeGrid" />
+                                                </p:commandButton>                                                  
+                                            </h:panelGrid>
+                                        </p:panel>
+                                        </h:form>
+                                    </p:dialog>                                                                            
+                                    <p:commandButton
+                                        icon="ui-icon-key"
+                                        style="border: 0; background: none; margin: 0; padding: 0; width: 16px; height: 16px; float: left;"
+                                        actionListener="#{userList.interceptUserId}"
+                                        onclick="pwdDlg.show()">
+                                        <f:attribute name="userId" value="#{user.id.longValue()}"/>                                     
+                                    </p:commandButton>                                                    
                                     <p:rowEditor />
                                 </p:column>
                                 <p:column filterBy="#{user.login}"   
@@ -339,7 +394,9 @@
                                 var="account"
                                 value="#{accountList.accounts}"
                                 filteredValue="#{accountList.filteredAccounts}"
-                                emptyMessage="Brak kont spełniających wymagane kryteria.">                            
+                                emptyMessage="Brak kont spełniających wymagane kryteria."
+                                rows="15"
+                                paginator="true">                            
                                 <p:column style="width:16px">  
                                     <p:rowToggler />
                                 </p:column>
@@ -633,7 +690,7 @@
                                         actionListener="#{newClient.save}" ajax="true"/>
                                     <p:commandButton 
                                         value="Wyczyść formularz"
-                                        process="newClientPanel" 
+                                        process="@this" 
                                         update="newClientGrid"   
                                         actionListener="#{newClient.reset()}">
                                         <p:resetInput target="newClientGrid" />
