@@ -3,7 +3,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:pe="http://primefaces.org/ui/extensions">
     <h:head>
         <title>Panel Kasjera</title>
         <h:outputStylesheet name="style.css"/>
@@ -14,28 +16,640 @@
                 <ui:include src="template/header.xhtml"/>
             </p:layoutUnit>
             <p:layoutUnit position="center">
-                
-                <p:tabView>
-                <p:tab title="Panel kasjera">
-                    Witaj <b><h:outputText value="#{authorization.user.name}" />&nbsp;<h:outputText value="#{authorization.user.surname}"/></b>.
-                </p:tab>
-                <p:tab title="Wpłaty">
-                    <h:outputText value="sadf" />
-                </p:tab>
-                <p:tab title="Wypłaty">
-                    <h:outputText value="iukui" />
-                </p:tab>
-                <p:tab title="Ustawienia">
-                    <h:outputText value="Ipsum" />
-                </p:tab>
-                <p:tab title="Koniec sesji">
-                    Aby zakończyć sesję użyj poniższego przycisku:
-                    <div style="display:block; text-align: center">
-                        <h:form>
-                            <p:commandButton action="#{authorization.Logout()}" value="Zakończ sesję"/>
+                <p:tabView id="menuTabs">
+                    <p:tab title="Panel kasjera">
+                        Witaj <b><h:outputText value="#{authorization.user.name}" />&nbsp;<h:outputText value="#{authorization.user.surname}"/></b>.
+                    </p:tab>
+                    <p:tab title="Lista klientów">
+                        <!-- LISTA KLIENTÓW -->
+                        <h:form id="clientList">                 
+                            <h:outputText id="stats" value="Wszystkich klientów w bazie: #{userList.users.size()}"/> <br/><br/>
+                            <p:growl id="messages" showDetail="true" rendered="true"/>
+                            <p:dataTable
+                                    id="usersList"
+                                    var="user"
+                                    value="#{userList.users}"
+                                    filteredValue="#{userList.filteredUsers}"
+                                    editable="true"
+                                    editMode="row"
+                                    emptyMessage="Brak klientów spełniających wymagane kryteria.">
+                                <p:ajax event="rowEdit" listener="#{userList.onEdit}" update=":menuTabs:clientList:messages" />
+                                <p:ajax event="rowEditCancel" listener="#{userList.onCancel}" update=":menuTabs:clientList:messages" />                               
+                                <p:column style="width:16px">  
+                                    <p:rowToggler />
+                                </p:column>
+                                <p:column>  
+                                    <p:rowEditor />
+                                </p:column>
+                                <p:column filterBy="#{user.login}"   
+                                        headerText="Login"
+                                        filterMatchMode="contains">
+                                    <p:cellEditor>  
+                                        <f:facet name="output">  
+                                            <h:outputText value="#{user.login}" />
+                                        </f:facet>  
+                                        <f:facet name="input">  
+                                            <p:inputText
+                                                value="#{user.login}"
+                                                style="width:100%"
+                                                validatorMessage="Login musi mieć od 3 do 32 znaków.">  
+                                                <f:validateLength minimum="3" maximum="32" />  
+                                            </p:inputText>
+                                        </f:facet>  
+                                    </p:cellEditor>
+                                </p:column>  
+
+                                <p:column filterBy="#{user.name}"  
+                                        headerText="Imię"
+                                        filterMatchMode="contains">
+                                    <p:cellEditor>
+                                        <f:facet name="output">  
+                                            <h:outputText value="#{user.name}" />
+                                        </f:facet>
+                                        <f:facet name="input">  
+                                            <p:inputText
+                                                value="#{user.name}"
+                                                style="width:100%"
+                                                validatorMessage="Imię musi mieć od 3 do 64 znaków.">  
+                                                <f:validateLength minimum="3" maximum="64" />
+                                            </p:inputText>
+                                        </f:facet>  
+                                    </p:cellEditor>                                        
+                                </p:column>  
+
+                                <p:column filterBy="#{user.surname}"   
+                                        headerText="Nazwisko"  
+                                        filterMatchMode="contains">  
+                                    <p:cellEditor>  
+                                        <f:facet name="output">  
+                                            <h:outputText value="#{user.surname}" />  
+                                        </f:facet>
+                                        <f:facet name="input">  
+                                            <p:inputText
+                                                value="#{user.surname}"
+                                                style="width:100%"
+                                                validatorMessage="Nazwisko musi mieć od 3 do 64 znaków.">
+                                                <f:validateLength minimum="3" maximum="64" />
+                                            </p:inputText>
+                                        </f:facet>  
+                                    </p:cellEditor>    
+                                </p:column>
+
+                                <p:column filterBy="#{user.address}"  
+                                        headerText="Adres"
+                                        filterMatchMode="contains">  
+                                    <p:cellEditor>  
+                                        <f:facet name="output">  
+                                            <h:outputText value="#{user.address}" />
+                                        </f:facet>
+                                        <f:facet name="input">  
+                                            <p:inputText
+                                                value="#{user.address}"
+                                                style="width:100%"
+                                                validatorMessage="Adres musi mieć od 3 do 255 znaków.">
+                                                <f:validateLength minimum="3" maximum="255"/>
+                                            </p:inputText>
+                                        </f:facet>  
+                                    </p:cellEditor>
+                                </p:column>
+
+                                <p:column filterBy="#{user.accounts.size()}"  
+                                        headerText="Ilość kont"
+                                        filterMatchMode="exact"
+                                        style="width: 32px">  
+                                        <h:outputText value="#{user.accounts.size()}" style="float:right;"/>
+                                </p:column>
+                                <p:rowExpansion>
+                                    
+                                    <p:commandButton
+                                        value="Dodaj nowe konto"
+                                        actionListener="#{userList.addNewAccount}"
+                                        update="@this,:menuTabs:clientList,:menuTabs:wholeAccountList">
+                                        <f:attribute name="userId" value="#{user.id.longValue()}"/>
+                                    </p:commandButton>
+                                    <p:accordionPanel id="accountList" var="account" value="#{user.accounts.toArray()}" activeIndex="-1">   
+                                        <p:tab title="Konto numer: #{account.number}">
+                                                <h:outputText value="Bilans: #{account.balance} PLN"/>
+                                                <p:commandButton
+                                                                 onclick="removeAccountDialogWidget.show()"
+                                                                 value="Usuń konto"
+                                                                 style="float:right;"
+                                                                 update=":menuTabs:clientList:accountNumberDialog,:menuTabs:clientList:accountNumberHiddenDialog">
+                                                    <f:setPropertyActionListener value="#{account.number}" target="#{container.accountNumber}" />
+                                                </p:commandButton>
+                                                <p:commandButton id="accountDetailsBtn" value="Historia transakcji" style="float:right"/>  
+                                                <p:overlayPanel id="accountDetailsPanel" for="accountDetailsBtn" hideEffect="fade" dynamic="true" appendToBody="true">  
+                                                 <!-- HISTORIA TRANSAKCJI -->
+                                                    <p:dataTable
+                                                        id="accountDetailsTable"
+                                                        var="transaction"
+                                                        value="#{account.transactionsList}"
+                                                        rows="10"
+                                                        paginator="true"
+                                                        emptyMessage="Brak transakcji dla tego konta">
+
+                                                        <p:column sortBy="#{transaction.sender}"> 
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Z rachunku" />  
+                                                            </f:facet>
+                                                            <h:outputText value="#{transaction.sender}"/>
+                                                        </p:column>
+
+                                                        <p:column sortBy="#{transaction.recipient}"> 
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Na rachunek" />  
+                                                            </f:facet>
+                                                            <h:outputText value="#{transaction.recipient}"/>
+                                                        </p:column>
+
+                                                        <p:column sortBy="#{transaction.description}">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Tytułem" />  
+                                                            </f:facet>
+                                                            <h:outputText value="#{transaction.description}" />
+                                                        </p:column>
+
+                                                        <p:column sortBy="#{transaction.amount}">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Kwota" />  
+                                                            </f:facet>                                                           
+                                                            <h:outputText value="#{transaction.amount} PLN" />  
+                                                        </p:column>
+
+                                                        <p:column sortBy="#{transaction.amount}">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Data" />
+                                                            </f:facet>                                                           
+                                                            <h:outputText value="#{transaction.completionDate}" />  
+                                                        </p:column>                                            
+                                                    </p:dataTable>  
+                                                </p:overlayPanel>
+
+                                                <p:commandButton id="accountWithdrawBtn" value="Wypłata" style="float: right">
+                                                    <f:setPropertyActionListener value="#{account.number}" target="#{newTransaction.senderAccountNumber}" />
+                                                </p:commandButton>
+                                                <p:overlayPanel
+                                                    id="withdrawPanel"
+                                                    for="accountWithdrawBtn"
+                                                    hideEffect="fade"
+                                                    dynamic="true"
+                                                    appendToBody="true"
+                                                    style="width:800px">  
+                                                <!-- WYPŁATA-->
+                                                    <h:form id="accountWithdrawForm">
+                                                        <p:panel id="accountWithdrawPanel">
+                                                        <p:messages />  
+                                                        <h:panelGrid columns="3" id="accountWithdrawGrid" style="margin-left: 20px; margin-right: 20px;">
+                                                            <h:outputLabel value="Numer konta:"/>
+                                                            <p:inputText
+                                                                id="senderAccountNumber"
+                                                                value="#{account.number}"
+                                                                disabled="true">
+                                                            </p:inputText>
+                                                            <p:message for="senderAccountNumber" display="icon"/>   
+
+                                                            <h:outputLabel value="Kwota:"/>
+                                                            <pe:inputNumber id="amount" value="#{newTransaction.amount}" symbol=" PLN" symbolPosition="s"  
+                                                                            decimalSeparator="," thousandSeparator="." validatorMessage="Kwota musi być wyższa niż 0 PLN.">
+                                                                <f:validateDoubleRange minimum="0.01"/>
+                                                            </pe:inputNumber>
+                                                            <p:message for="amount" display="icon"/>                                                     
+
+                                                            <h:outputLabel value="Tytułem:"/>
+                                                            <p:inputTextarea
+                                                                id="description"
+                                                                value="#{newTransaction.description}"
+                                                                required="true"
+                                                                rows="5"
+                                                                cols="50"
+                                                                requiredMessage="Musisz wypełnić pole &quot;Tytułem&quot;!"
+                                                                validatorMessage="Pole &quot;Tytułem&quot; może mieć tylko od 2 do 255 znaków.">
+                                                                <f:validateLength minimum="2" maximum="255"/> 
+                                                            </p:inputTextarea>
+                                                            <p:message for="description" display="icon"/>                                                         
+
+                                                            <p:commandButton value="Wykonaj wypłatę"
+                                                                             update="accountWithdrawPanel"
+                                                                             process="@form"
+                                                                             actionListener="#{newTransaction.doWithdraw}"/>
+                                                            <p:commandButton 
+                                                                             value="Wyczyść"
+                                                                             process="@this" 
+                                                                             update="accountWithdrawGrid"   
+                                                                             actionListener="#{newTransaction.reset()}">
+                                                                <p:resetInput target="accountWithdrawGrid" />
+                                                            </p:commandButton>                                                  
+                                                        </h:panelGrid>
+                                                        </p:panel>
+                                                    </h:form>
+                                                </p:overlayPanel>
+                                                
+                                                <p:commandButton id="accountDepositBtn" value="Wpłata" style="float:right">
+                                                    <f:setPropertyActionListener value="#{account.number}" target="#{newTransaction.senderAccountNumber}" />
+                                                </p:commandButton>
+                                                <p:overlayPanel
+                                                    id="depositPanel"
+                                                    for="accountDepositBtn"
+                                                    hideEffect="fade"
+                                                    dynamic="true"
+                                                    appendToBody="true"
+                                                    style="width:800px">  
+                                                <!-- WPŁATA-->
+                                                    <h:form id="accountDepositForm">
+                                                        <p:panel id="accountDepositPanel">
+                                                        <p:messages />  
+                                                        <h:panelGrid columns="3" id="accountDepositGrid" style="margin-left: 20px; margin-right: 20px;">
+                                                            <h:outputLabel value="Numer konta:"/>
+                                                            <p:inputText
+                                                                id="senderAccountNumber"
+                                                                value="#{account.number}"
+                                                                disabled="true">
+                                                            </p:inputText>
+                                                            <p:message for="senderAccountNumber" display="icon"/>
+
+                                                            <h:outputLabel value="Kwota:"/>
+                                                            <pe:inputNumber id="amount" value="#{newTransaction.amount}" symbol=" PLN" symbolPosition="s"  
+                                                                            decimalSeparator="," thousandSeparator="." validatorMessage="Kwota musi być wyższa niż 0 PLN.">
+                                                                <f:validateDoubleRange minimum="0.01"/>
+                                                            </pe:inputNumber>
+                                                            <p:message for="amount" display="icon"/>                                                     
+
+                                                            <h:outputLabel value="Tytułem:"/>
+                                                            <p:inputTextarea
+                                                                id="description"
+                                                                value="#{newTransaction.description}"
+                                                                required="true"
+                                                                rows="5"
+                                                                cols="50"
+                                                                requiredMessage="Musisz wypełnić pole &quot;Tytułem&quot;!"
+                                                                validatorMessage="Pole &quot;Tytułem&quot; może mieć tylko od 2 do 255 znaków.">
+                                                                <f:validateLength minimum="2" maximum="255"/> 
+                                                            </p:inputTextarea>
+                                                            <p:message for="description" display="icon"/>                                                         
+
+                                                            <p:commandButton value="Wykonaj wpłatę"
+                                                                             update="accountDepositPanel"
+                                                                             process="@form"                                                                        
+                                                                             actionListener="#{newTransaction.doDeposit}" ajax="true"/>
+                                                            <p:commandButton 
+                                                                             value="Wyczyść"
+                                                                             process="@this" 
+                                                                             update="accountDepositGrid"   
+                                                                             actionListener="#{newTransaction.reset()}">
+                                                                <p:resetInput target="accountDepositGrid" />
+                                                            </p:commandButton>                                                  
+                                                        </h:panelGrid>
+                                                        </p:panel>
+                                                    </h:form>
+                                                </p:overlayPanel>
+                                        </p:tab>
+                                    </p:accordionPanel>    
+                                </p:rowExpansion>
+                            </p:dataTable>
+                            <p:confirmDialog
+                                header="Usuwanie konta"
+                                severity="alert" 	
+                                widgetVar="removeAccountDialogWidget"
+                                appendToBody="true">
+                                <f:facet name="message">
+                                    <h:outputText value="Czy chcesz usunąć konto o numerze #{container.accountNumber} ?"  id="accountNumberDialog" />
+                                    <h:inputHidden value="#{container.accountNumber}" id="accountNumberHiddenDialog"/>
+                                </f:facet>
+                                <p:commandButton
+                                    value="Tak, usuń"
+                                    actionListener="#{userList.deleteAccount}"
+                                    update="@this,:menuTabs:clientList:stats,:menuTabs:clientList:usersList,:menuTabs:wholeAccountList:wholeAccounts,:menuTabs:wholeAccountList:stats,messages"
+                                    oncomplete="removeAccountDialogWidget.hide()">
+                                    <f:attribute name="accountNumber" value="#{container.accountNumber}"/>
+                                </p:commandButton>
+                                <p:commandButton
+                                    value="Nie usuwaj"
+                                    onclick="removeAccountDialogWidget.hide();"
+                                    type="button" />
+                            </p:confirmDialog>   
+                        </h:form>                     
+                    </p:tab>
+                    <p:tab title="Lista kont">
+                        <!-- LISTA KONT -->
+                        <h:form id="wholeAccountList">
+                            <h:outputText id="stats" value="Wszystkich kont w bazie: #{accountList.accounts.size()}"/> <br/><br/>
+                            <p:growl id="messages" showDetail="true" rendered="true"/>
+                            <p:dataTable
+                                id="wholeAccounts"
+                                var="account"
+                                value="#{accountList.accounts}"
+                                filteredValue="#{accountList.filteredAccounts}"
+                                emptyMessage="Brak kont spełniających wymagane kryteria.">                            
+                                <p:column style="width:16px">  
+                                    <p:rowToggler />
+                                </p:column>
+                                <p:column
+                                    filterBy="#{account.number}"   
+                                    headerText="Numer konta"
+                                    filterMatchMode="contains">
+                                    <h:outputText value="#{account.number}" />
+                                </p:column>  
+                                <p:column
+                                    filterBy="#{account.user.name}"  
+                                    headerText="Imię właściciela"
+                                    filterMatchMode="contains">  
+                                    <h:outputText value="#{account.user.name}" />                                    
+                                </p:column>  
+                                <p:column
+                                    filterBy="#{account.user.surname}"   
+                                    headerText="Nazwisko właściciela"  
+                                    filterMatchMode="contains">  
+                                    <h:outputText value="#{account.user.surname}" />  
+                                </p:column>
+                                <p:column
+                                    filterBy="#{account.user.address}"  
+                                    headerText="Adres właściciela"
+                                    filterMatchMode="contains">  
+                                    <h:outputText value="#{account.user.address}" />
+                                </p:column>
+                                    
+                                <p:rowExpansion>
+                                    <h:outputText value="Bilans: #{account.balance} PLN"/>
+                                    <p:commandButton
+                                        onclick="removeAccountDialogWidget.show()"
+                                        value="Usuń konto"
+                                        style="float:right;"
+                                        update=":menuTabs:clientList:accountNumberDialog,:menuTabs:clientList:accountNumberHiddenDialog">
+                                        <f:setPropertyActionListener value="#{account.number}" target="#{container.accountNumber}" />
+                                    </p:commandButton>
+                                    <p:commandButton id="accountDetailsBtn" value="Historia transakcji" style="float:right"/>  
+                                    <p:overlayPanel id="accountDetailsPanel" for="accountDetailsBtn" hideEffect="fade" dynamic="true" appendToBody="true">  
+                                        <!-- HISTORIA TRANSAKCJI -->
+                                        <p:dataTable
+                                            id="accountDetailsTable"
+                                            var="transaction"
+                                            value="#{account.transactionsList}"
+                                            rows="10"
+                                            paginator="true"
+                                            emptyMessage="Brak transakcji dla tego konta">
+                                                
+                                            <p:column sortBy="#{transaction.sender}"> 
+                                                <f:facet name="header">
+                                                    <h:outputText value="Z rachunku" />  
+                                                </f:facet>
+                                                <h:outputText value="#{transaction.sender}"/>
+                                            </p:column>
+                                                
+                                            <p:column sortBy="#{transaction.recipient}"> 
+                                                <f:facet name="header">
+                                                    <h:outputText value="Na rachunek" />  
+                                                </f:facet>
+                                                <h:outputText value="#{transaction.recipient}"/>
+                                            </p:column>
+                                                
+                                            <p:column sortBy="#{transaction.description}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Tytułem" />  
+                                                </f:facet>
+                                                <h:outputText value="#{transaction.description}" />
+                                            </p:column>
+                                                
+                                            <p:column sortBy="#{transaction.amount}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Kwota" />  
+                                                </f:facet>                                                           
+                                                <h:outputText value="#{transaction.amount} PLN" />  
+                                            </p:column>
+                                                
+                                            <p:column sortBy="#{transaction.amount}">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Data" />
+                                                </f:facet>                                                           
+                                                <h:outputText value="#{transaction.completionDate}" />  
+                                            </p:column>                                            
+                                        </p:dataTable>  
+                                    </p:overlayPanel>
+                                        
+                                    <p:commandButton id="accountWithdrawBtn" value="Wypłata" style="float: right">
+                                        <f:setPropertyActionListener value="#{account.number}" target="#{newTransaction.senderAccountNumber}" />
+                                    </p:commandButton>
+                                    <p:overlayPanel
+                                        id="withdrawPanel"
+                                        for="accountWithdrawBtn"
+                                        hideEffect="fade"
+                                        dynamic="true"
+                                        appendToBody="true"
+                                        style="width:800px">  
+                                        <!-- WYPŁATA-->
+                                        <h:form id="accountWithdrawForm">
+                                            <p:panel id="accountWithdrawPanel">
+                                                <p:messages />  
+                                                <h:panelGrid columns="3" id="accountWithdrawGrid" style="margin-left: 20px; margin-right: 20px;">
+                                                    <h:outputLabel value="Numer konta:"/>
+                                                    <p:inputText
+                                                        id="senderAccountNumber"
+                                                        value="#{account.number}"
+                                                        disabled="true">
+                                                    </p:inputText>
+                                                    <p:message for="senderAccountNumber" display="icon"/>   
+                                                        
+                                                    <h:outputLabel value="Kwota:"/>
+                                                    <pe:inputNumber id="amount" value="#{newTransaction.amount}" symbol=" PLN" symbolPosition="s"  
+                                                                    decimalSeparator="," thousandSeparator="." validatorMessage="Kwota musi być wyższa niż 0 PLN.">
+                                                        <f:validateDoubleRange minimum="0.01"/>
+                                                    </pe:inputNumber>
+                                                    <p:message for="amount" display="icon"/>                                                     
+                                                        
+                                                    <h:outputLabel value="Tytułem:"/>
+                                                    <p:inputTextarea
+                                                        id="description"
+                                                        value="#{newTransaction.description}"
+                                                        required="true"
+                                                        rows="5"
+                                                        cols="50"
+                                                        requiredMessage="Musisz wypełnić pole &quot;Tytułem&quot;!"
+                                                        validatorMessage="Pole &quot;Tytułem&quot; może mieć tylko od 2 do 255 znaków.">
+                                                        <f:validateLength minimum="2" maximum="255"/> 
+                                                    </p:inputTextarea>
+                                                    <p:message for="description" display="icon"/>                                                         
+                                                        
+                                                    <p:commandButton value="Wykonaj wypłatę"
+                                                                     update="accountWithdrawPanel"
+                                                                     process="@form"
+                                                                     actionListener="#{newTransaction.doWithdraw}"/>
+                                                    <p:commandButton 
+                                                        value="Wyczyść"
+                                                        process="@this" 
+                                                        update="accountWithdrawGrid"   
+                                                        actionListener="#{newTransaction.reset()}">
+                                                        <p:resetInput target="accountWithdrawGrid" />
+                                                    </p:commandButton>                                                  
+                                                </h:panelGrid>
+                                            </p:panel>
+                                        </h:form>
+                                    </p:overlayPanel>
+                                        
+                                    <p:commandButton id="accountDepositBtn" value="Wpłata" style="float:right">
+                                        <f:setPropertyActionListener value="#{account.number}" target="#{newTransaction.senderAccountNumber}" />
+                                    </p:commandButton>
+                                    <p:overlayPanel
+                                        id="depositPanel"
+                                        for="accountDepositBtn"
+                                        hideEffect="fade"
+                                        dynamic="true"
+                                        appendToBody="true"
+                                        style="width:800px">  
+                                        <!-- WPŁATA-->
+                                        <h:form id="accountDepositForm">
+                                            <p:panel id="accountDepositPanel">
+                                                <p:messages />  
+                                                <h:panelGrid columns="3" id="accountDepositGrid" style="margin-left: 20px; margin-right: 20px;">
+                                                    <h:outputLabel value="Numer konta:"/>
+                                                    <p:inputText
+                                                        id="senderAccountNumber"
+                                                        value="#{account.number}"
+                                                        disabled="true">
+                                                    </p:inputText>
+                                                    <p:message for="senderAccountNumber" display="icon"/>
+                                                        
+                                                    <h:outputLabel value="Kwota:"/>
+                                                    <pe:inputNumber
+                                                        id="amount"
+                                                        value="#{newTransaction.amount}"
+                                                        symbol=" PLN"
+                                                        symbolPosition="s"  
+                                                        decimalSeparator=","
+                                                        thousandSeparator="."
+                                                        validatorMessage="Kwota musi być wyższa niż 0 PLN.">
+                                                        <f:validateDoubleRange minimum="0.01"/>
+                                                    </pe:inputNumber>
+                                                    <p:message for="amount" display="icon"/>                                                     
+                                                        
+                                                    <h:outputLabel value="Tytułem:"/>
+                                                    <p:inputTextarea
+                                                        id="description"
+                                                        value="#{newTransaction.description}"
+                                                        required="true"
+                                                        rows="5"
+                                                        cols="50"
+                                                        requiredMessage="Musisz wypełnić pole &quot;Tytułem&quot;!"
+                                                        validatorMessage="Pole &quot;Tytułem&quot; może mieć tylko od 2 do 255 znaków.">
+                                                        <f:validateLength minimum="2" maximum="255"/> 
+                                                    </p:inputTextarea>
+                                                    <p:message for="description" display="icon"/>                                                         
+                                                        
+                                                    <p:commandButton
+                                                        value="Wykonaj wpłatę"
+                                                        update="accountDepositPanel"
+                                                        process="@form"                                                                        
+                                                        actionListener="#{newTransaction.doDeposit}" ajax="true"/>
+                                                    <p:commandButton 
+                                                        value="Wyczyść"
+                                                        process="@this" 
+                                                        update="accountDepositGrid"   
+                                                        actionListener="#{newTransaction.reset()}">
+                                                        <p:resetInput target="accountDepositGrid" />
+                                                    </p:commandButton>                                                  
+                                                </h:panelGrid>
+                                            </p:panel>                                            
+                                        </h:form>
+                                    </p:overlayPanel>
+                                </p:rowExpansion>
+                            </p:dataTable>                               
                         </h:form>
-                    </div>
-                </p:tab>
+                    </p:tab>
+                    <p:tab title="Nowy klient">
+                        <h:form id="newClient">
+                            <p:panel id="newClientPanel">
+                                <p:messages autoUpdate="true"/>
+                                <h:panelGrid columns="3" id="newClientGrid">
+                                    <h:outputLabel value="Imię:"/>
+                                    <p:inputText
+                                        id="userName"
+                                        value="#{newClient.name}"
+                                        required="true"
+                                        requiredMessage="Musisz wypełnić pole &quot;Imię&quot;!"
+                                        validatorMessage="Pole &quot;Imię&quot; może mieć tylko od 2 do 32 znaków.">
+                                        <f:validateLength minimum="2" maximum="32"/> 
+                                    </p:inputText>
+                                    <p:message for="userName" display="icon"/>
+                                        
+                                    <h:outputLabel value="Nazwisko:"/>
+                                    <p:inputText
+                                        id="userSurname"
+                                        value="#{newClient.surname}"
+                                        required="true"
+                                        requiredMessage="Musisz wypełnić pole &quot;Nazwisko&quot;!"
+                                        validatorMessage="Pole &quot;Nazwisko&quot; może mieć tylko od 2 do 32 znaków.">
+                                        <f:validateLength minimum="2" maximum="32"/> 
+                                    </p:inputText>
+                                    <p:message for="userSurname" display="icon"/>
+                                    
+                                    <h:outputLabel value="Adres zamieszkania:"/>
+                                    <p:inputText
+                                        id="userAddress"
+                                        value="#{newClient.address}"
+                                        required="true"
+                                        requiredMessage="Musisz wypełnić pole &quot;Adres zamieszkania&quot;!"
+                                        validatorMessage="Pole &quot;Adres zamieszkania&quot; może mieć tylko od 2 do 255 znaków."
+                                        style="width:300px">
+                                        <f:validateLength minimum="2" maximum="255"/> 
+                                    </p:inputText>
+                                    <p:message for="userSurname" display="icon"/>                                    
+                                    
+                                    <h:outputLabel value="Login:"/>
+                                    <p:inputText
+                                        id="userLogin"
+                                        value="#{newClient.login}"
+                                        required="true"
+                                        requiredMessage="Musisz wypełnić pole &quot;Login&quot;!"
+                                        validatorMessage="Pole &quot;Login&quot; może mieć tylko od 2 do 32 znaków. Hasła muszą być identyczne.">
+                                        <f:validateLength minimum="2" maximum="32"/> 
+                                    </p:inputText>
+                                    <p:message for="userLogin" display="icon"/>
+                                        
+                                    <h:outputLabel value="Hasło: "/>
+                                    <p:password
+                                        id="userPassword1"
+                                        value="#{newClient.password}"
+                                        match="userPassword2"
+                                        required="true"
+                                        requiredMessage="Musisz wypełnić pole &quot;Hasło&quot;!"
+                                        validatorMessage="Pole &quot;hasło&quot; może mieć tylko od 5 do 64 znaków.">
+                                        <f:validateLength minimum="5" maximum="64"/> 
+                                    </p:password>
+                                    <p:message for="userPassword1" display="icon"/>
+                                        
+                                    <h:outputLabel value="Powtórz hasło:"/>
+                                    <p:password
+                                        id="userPassword2"
+                                        value="#{newClient.password}"
+                                        required="true"
+                                        requiredMessage="Musisz wypełnić pole &quot;Powtórz hasło&quot;!"
+                                        validatorMessage="Pole &quot;Powtórz hasło&quot; może mieć tylko od 5 do 64 znaków.">
+                                        <f:validateLength minimum="5" maximum="64"/> 
+                                    </p:password>
+                                    <p:message for="userPassword2" display="icon"/>                                    
+                                        
+                                    <p:commandButton
+                                        value="Dodaj klienta"
+                                        update="newClientPanel,:menuTabs:clientList"
+                                        process="@form"                                                                        
+                                        actionListener="#{newClient.save}" ajax="true"/>
+                                    <p:commandButton 
+                                        value="Wyczyść formularz"
+                                        process="newClientPanel" 
+                                        update="newClientGrid"   
+                                        actionListener="#{newClient.reset()}">
+                                        <p:resetInput target="newClientGrid" />
+                                    </p:commandButton>                                                  
+                                </h:panelGrid>
+                            </p:panel>                           
+                        </h:form>
+                    </p:tab>                    
+                    <p:tab title="Koniec sesji">
+                        Aby zakończyć sesję użyj poniższego przycisku:
+                        <div style="display:block; text-align: center">
+                            <h:form>
+                                <p:commandButton action="#{authorization.Logout()}" value="Zakończ sesję"/>
+                            </h:form>
+                        </div>
+                    </p:tab>
                 </p:tabView>
                 
             </p:layoutUnit>

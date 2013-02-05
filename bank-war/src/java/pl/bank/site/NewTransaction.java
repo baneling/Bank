@@ -92,7 +92,6 @@ public class NewTransaction {
     
     public void transfer(Account sender, Account recipient, float amount)
     {
-        System.err.println("TRANSFER");
         sender.setBalance(sender.getBalance() - amount);
         recipient.setBalance(recipient.getBalance() + amount);
         accountFacade.save(sender);
@@ -117,9 +116,62 @@ public class NewTransaction {
         transaction.setType(TransactionType.INCOMING);
         transactionFacade.save(transaction);
 
+        // refresh
         authorizationBean.setUser(userFacade.find(authorizationBean.getUser().getId()));
     }
 
+    public void deposit(Account account, float amount)
+    {
+        account.setBalance(account.getBalance() + amount);
+        accountFacade.save(account);
+        
+        Transaction transaction = new Transaction();
+        transaction.setAccount(account);
+        transaction.setAmount(amount);
+        transaction.setCompletionDate(Calendar.getInstance().getTime());
+        transaction.setSecondSide("/ wpłata własna /");
+        transaction.setDescription(description);
+        transaction.setType(TransactionType.INCOMING);
+        transactionFacade.save(transaction);
+    }
+    
+    public void withdraw(Account account, float amount)
+    {
+        account.setBalance(account.getBalance() - amount);
+        accountFacade.save(account);
+        
+        Transaction transaction = new Transaction();
+        transaction.setAccount(account);
+        transaction.setAmount(amount);
+        transaction.setCompletionDate(Calendar.getInstance().getTime());
+        transaction.setSecondSide("/ wypłata własna /");
+        transaction.setDescription("/ wypłata /");
+        transaction.setType(TransactionType.OUTGOING);
+        transactionFacade.save(transaction);
+    }
+
+    public void doWithdraw(ActionEvent event) throws IOException
+    {
+        Account account = accountFacade.getByNumber(senderAccountNumber);
+        if(account.getBalance() < amount)
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Brak wystarczających środków na koncie", ""));
+        else
+        {
+            withdraw(account, amount);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Wypłata została wykonana", ""));
+            reset();
+            FacesContext.getCurrentInstance().getExternalContext().redirect("cashier.xhtml");            
+        }
+    }
+    
+    public void doDeposit(ActionEvent event) throws IOException
+    {
+        Account account = accountFacade.getByNumber(senderAccountNumber);
+        deposit(account, amount);
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Wpłata została wykonana", ""));
+        reset();
+        FacesContext.getCurrentInstance().getExternalContext().redirect("cashier.xhtml");
+    }
     /**
      * @return the accountNumber
      */

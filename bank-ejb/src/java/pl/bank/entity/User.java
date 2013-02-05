@@ -8,6 +8,11 @@ import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -18,6 +23,7 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 /**
@@ -32,11 +38,23 @@ import javax.persistence.Table;
        query="SELECT u FROM User u"
     ),
     @NamedQuery(
+       name = "findByLogin", 
+       query="SELECT u FROM User u WHERE u.login = :login"
+    ),        
+    @NamedQuery(
+       name = "findByType", 
+       query="SELECT u FROM User u WHERE u.userType = :type"
+    ),
+    @NamedQuery(
+       name = "findById", 
+       query="SELECT u FROM User u WHERE u.id = :id"
+    ),       
+    @NamedQuery(
         name = "findUsers",
         query="SELECT u FROM User u WHERE u.name LIKE :term OR u.surname LIKE :term OR u.login LIKE :term"
     ),
     @NamedQuery(
-        name = "findUserLoginPassword",
+        name = "findByLoginPassword",
         query="SELECT u FROM User u WHERE u.login = :login AND u.password = :password"
     )        
 })
@@ -55,6 +73,7 @@ public class User implements Serializable {
     private UserType userType;
     
     @OneToMany(mappedBy = "user", fetch= FetchType.EAGER)
+    @OrderBy("number ASC") 
     private Set<Account> accounts = new HashSet<Account>();
 
     public Long getId() {

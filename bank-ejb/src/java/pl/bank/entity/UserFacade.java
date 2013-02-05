@@ -37,10 +37,35 @@ public class UserFacade extends AbstractFacade<User> {
         }                 
     }
     
-    public List<User> findByUsername(String searchTerm){
-        if(searchTerm != null){
-            Query q = em.createNamedQuery("findUsers"); 
-            q.setParameter("term", searchTerm);
+    public List<User> findByType(UserType type){
+        try{
+            Query q = em.createNamedQuery("findByType");
+            q.setParameter("type", type);
+            return q.getResultList();
+        } catch (javax.persistence.NoResultException ex) {
+            return null;
+        }
+    }
+    
+    public User findById(long id)
+    {
+        User u;
+        Query q = em.createNamedQuery("findById"); 
+        q.setParameter("id", id);
+        try{
+            u = (User)q.getSingleResult();
+        }
+        catch(NoResultException e)
+        {
+            u = null;
+        }
+        return u;
+    }
+    
+    public List<User> findByLogin(String login){
+        if(login != null){
+            Query q = em.createNamedQuery("findByLogin"); 
+            q.setParameter("login", login);
             return q.getResultList();
         }else{
             try{
@@ -48,13 +73,13 @@ public class UserFacade extends AbstractFacade<User> {
             } catch (javax.persistence.NoResultException ex) {
                 return null;
             }
-        }    
+        }
     }
     
-    public User findByUsernamePassword(String login, String password) throws NoSuchAlgorithmException
+    public User findByLoginPassword(String login, String password) throws NoSuchAlgorithmException
     {
         User u;
-        Query q = em.createNamedQuery("findUserLoginPassword"); 
+        Query q = em.createNamedQuery("findByLoginPassword"); 
         q.setParameter("login", login);
         q.setParameter("password", sha512(password));
         try{

@@ -4,6 +4,7 @@
  */
 package pl.bank.site;
 
+import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
@@ -21,7 +22,7 @@ import pl.bank.entity.UserType;
  */
 @ManagedBean
 @SessionScoped
-public class Authorization {
+public class Authorization implements Serializable{
 
     private String login;
     private String password;
@@ -38,7 +39,7 @@ public class Authorization {
     public String Login() throws NoSuchAlgorithmException
     {
         HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(true);
-        setUser(userFacade.findByUsernamePassword(login, password));
+        setUser(userFacade.findByLoginPassword(login, password));
         session.setAttribute("user", getUser());
         if(getUser() == null)
         {

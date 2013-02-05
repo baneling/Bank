@@ -27,7 +27,7 @@ import javax.persistence.OrderBy;
 @NamedQueries({
     @NamedQuery(
        name = "getAccounts", 
-       query="SELECT a FROM Account a"
+       query="SELECT a FROM Account a ORDER BY a.number ASC"
     ),
     @NamedQuery(
        name = "findByNumber", 
@@ -92,6 +92,7 @@ public class Account implements Serializable {
      * @param balance the balance to set
      */
     public void setBalance(float balance) {
+        balance = Math.round(balance*100f)/100f;
         this.balance = balance;
     }
 
