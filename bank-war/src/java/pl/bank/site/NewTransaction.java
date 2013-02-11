@@ -14,6 +14,7 @@ import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.servlet.http.HttpSession;
+import pl.bank.client.TransactionOutcoming;
 import pl.bank.entity.Account;
 import pl.bank.entity.AccountFacade;
 import pl.bank.entity.Transaction;
@@ -35,6 +36,8 @@ public class NewTransaction {
     private AccountFacade accountFacade;
     @EJB
     private UserFacade userFacade;
+    @EJB
+    private TransactionOutcoming client;    
     
     private Long senderAccountNumber = null;
     private Long accountNumber = null;
@@ -63,7 +66,7 @@ public class NewTransaction {
         {
             // tutaj sprawdzanie numerów konta - uwzględnić webserwis
             recipientAccount = accountFacade.getByNumber(accountNumber);
-            if(recipientAccount == null)
+            if(recipientAccount == null || !client.checkAccount(accountNumber))
             {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Konto o takim numerze nie istnieje!", ""));
             }
@@ -105,17 +108,24 @@ public class NewTransaction {
         transaction.setDescription(description);
         transaction.setType(TransactionType.OUTGOING);
         transactionFacade.save(transaction);
-        
-        // incoming
-        transaction = new Transaction();     
-        transaction.setAccount(recipient);
-        transaction.setAmount(amount);
-        transaction.setCompletionDate(Calendar.getInstance().getTime());
-        transaction.setSecondSide(sender.getUser().getName()+" "+sender.getUser().getSurname()+" / "+sender.getNumber());
-        transaction.setDescription(description);
-        transaction.setType(TransactionType.INCOMING);
-        transactionFacade.save(transaction);
-
+        if(Math.round((float) (accountNumber/1e8)) == 2 && client.checkAccount(accountNumber)){
+            System.err.println("WEBSERVIS CALL");
+            client.send(accountNumber, sender.getUser().getName(), sender.getUser().getName(), description, accountNumber, amount);
+        }
+        else{     
+            recipient.setBalance(recipient.getBalance() + amount);
+            accountFacade.save(recipient);
+            
+            // incoming
+            transaction = new Transaction();     
+            transaction.setAccount(recipient);
+            transaction.setAmount(amount);
+            transaction.setCompletionDate(Calendar.getInstance().getTime());
+            transaction.setSecondSide(sender.getUser().getName()+" "+sender.getUser().getSurname()+" / "+sender.getNumber());
+            transaction.setDescription(description);
+            transaction.setType(TransactionType.INCOMING);
+            transactionFacade.save(transaction);
+        }
         // refresh
         authorizationBean.setUser(userFacade.find(authorizationBean.getUser().getId()));
     }
@@ -163,7 +173,7 @@ public class NewTransaction {
             FacesContext.getCurrentInstance().getExternalContext().redirect("cashier.xhtml");            
         }
     }
-    
+
     public void doDeposit(ActionEvent event) throws IOException
     {
         Account account = accountFacade.getByNumber(senderAccountNumber);

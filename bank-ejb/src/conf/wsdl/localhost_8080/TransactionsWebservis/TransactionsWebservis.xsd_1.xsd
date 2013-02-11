@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?><!-- Published by JAX-WS RI at http://jax-ws.dev.java.net. RI's version is Metro/2.2.0-1 (tags/2.2.0u1-7139; 2012-06-02T10:55:19+0000) JAXWS-RI/2.2.6-2 JAXWS/2.2 svn-revision#unknown. --><xs:schema xmlns:tns="http://webservis.bank.pl/" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0" targetNamespace="http://webservis.bank.pl/">
+
+<xs:element name="checkAccount" type="tns:checkAccount"/>
+
+<xs:element name="checkAccountResponse" type="tns:checkAccountResponse"/>
+
+<xs:element name="receive" type="tns:receive"/>
+
+<xs:complexType name="receive">
+<xs:sequence>
+<xs:element name="accountNumber" type="xs:long" minOccurs="0"/>
+<xs:element name="senderName" type="xs:string" minOccurs="0"/>
+<xs:element name="senderSurname" type="xs:string" minOccurs="0"/>
+<xs:element name="description" type="xs:string" minOccurs="0"/>
+<xs:element name="senderNumber" type="xs:long" minOccurs="0"/>
+<xs:element name="amount" type="xs:float"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="checkAccount">
+<xs:sequence>
+<xs:element name="accountNumber" type="xs:long" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="checkAccountResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:boolean"/>
+</xs:sequence>
+</xs:complexType>
+</xs:schema>
